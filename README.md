@@ -1,6 +1,9 @@
 Kaggle Belkin competition
 =========================
 
+WARNING:Don't add raw data to the git repo, it's too big and github
+won't like it. (Also, it will make everything really slow).
+
 BD had some thoughts:
 ---------------------
 
