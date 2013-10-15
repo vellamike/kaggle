@@ -242,6 +242,61 @@ def total_on_time(d):
         print("{0}: {1}s".format(n, t))
     return appliances
 
+def hf_time_slice(d, stamp):
+    ''' Plots spectogram at the next time after the timestamp. '''
+    for (i, t) in enumerate(d.HF_TimeTicks):
+        if t > stamp:
+            slice = i
+    HF_slice = d.HF[:, i]
+    assert(len(HF_slice) == 4096)
+    fig = figure(972)
+    ax1 = fig.add_subplot(111)
+    ax1.plot(range(4096), HF_slice)
+    ax1.autoscale(tight = True)
+    return fig
+
+def local_least_squares(d, 
+                        stamp,
+                        peak_freqency_bucket,
+                        window_size):
+    ''' Let's try something simpler before implementing this. '''
+
+def predict_kitchen_dimmer(d):
+    ''' Hopefully a prototype for a more general prediction algorithm. ''' 
+    # The kitchen dimmer creates a peak around bin 4000.
+    # Bin 4000 is the 96th bin from the end.
+    # Each bin corresponds to 244 Hz, so the kitchen dimmer has a
+    # peak at around 24kHz.
+ 
+    power_in_range = np.zeros(len(d.HF_TimeTicks))
+    for (i, t) in enumerate(d.HF_TimeTicks):
+        # Take an average over neighbouring bins.
+        power_in_range[i] = sum(d.HF[3999:4002, i])/3.0
+        
+    fig = figure(222)
+    ax1 = fig.add_subplot(111)
+    ax1.plot(d.HF_TimeTicks, power_in_range)
+
+def bin_data(d):
+    ''' Puts the HF data into bins in time and frequency space. The idea is that we might realize a particular device has been turned on if there is suddenly much more power in a particular bin. '''
+    # HF has shape 4096 x 81000
+    freq_bins = 2048
+    time_bins = 1000
+
+    freqs = len(d.HF)
+    times = len(d.HF[0])
+    f_bin_size = freqs // freq_bins 
+    # Don't worry for now that it doesn't fit exactly.
+    t_bin_size = times // time_bins 
+    
+    HF_binned = np.zeros((freq_bins, time_bins))
+    for i in range(freq_bins):
+        print(i)
+        for j in range(time_bins):
+            HF_binned[i, j] = sum(sum(d.HF[i * f_bin_size: (i+1) * f_bin_size,\
+                                  j * t_bin_size : (j+1) * t_bin_size]))
+    np.save("HF_binned" + str(freq_bins) + "-" +str(time_bins), HF_binned) 
+
 def hf_plot(d):
     fig = figure(1)
     ax1 = fig.add_subplot(111)
