@@ -41,7 +41,7 @@ In [89]: ml.device_sample_all(d)
 * Percentage equivalent ON time: Approximate_on_time / timepoints = 0.32 * 38 / 2 = 6.08
 
 MV Thoughts:
---------------
+------------
 As a 1st order approx we should:
 
 * Assume a divice is off if error margin seems big (6.08% on-time
@@ -52,3 +52,12 @@ As a 1st order approx we should:
   This is particularly true because looking at the forums it seems as
   though there are issues with tagging of washing machines.
   
+Naming notes:
+-------------
+
+* 1 = Phase 1
+* 2 = Phase 2
+* LF = Low freq
+* HF = High freq
+* V = Voltage
+* I = current

@@ -7,7 +7,7 @@ import pdb
 from operator import itemgetter, attrgetter
 import datetime
 
-def load_data(file = "H4/Tagged_Training_07_26_1343286001"):
+def load_data(file = "H4/Tagged_Training_07_26_1343286001.mat"):
     ''' Load the .mat files. '''
     #testData = io.loadmat('data/H4/Testing_09_13_1347519601.mat', struct_as_record=False, squeeze_me=True)
     
@@ -20,6 +20,7 @@ def load_data(file = "H4/Tagged_Training_07_26_1343286001"):
 
     # Extract tables
     buf = taggingData['Buffer']
+    pdb.set_trace()
     d = DataStore()
     LF1V = buf.LF1V
     LF1I = buf.LF1I
