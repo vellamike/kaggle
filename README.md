@@ -50,5 +50,8 @@ As a 1st order approx we should:
 * Error function such that divices which are not on very much (e.g
   Washing machines, toasters) should just be set to permanently off.
   This is particularly true because looking at the forums it seems as
-  though there are issues with tagging of washing machines.
+  though there are issues with tagging of washing machines. BD: As a result of this forum whinging, 
+  admins [decided to correct](http://www.kaggle.com/c/belkin-energy-disaggregation-competition/forums/t/5933/when-will-the-back-end-changes-happen) parts of the data set, with changes happen by Oct 15. 
+  Let's have a bool flag for the washing machine, so we can test with and w\o it. 
+  If they've tagged it, a 2 hour runtime is worth predicting.
   
