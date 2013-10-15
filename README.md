@@ -17,7 +17,9 @@ BD had some thoughts:
 
 
 ```
-In [87]: d = ml.load_data()
+In [86]: import mat_loading as ml
+
+In [87]: d = ml.load_data(file='H4/Tagged_Training_07_26_1343286001')
 start: 
 2012-07-26 08:00:01
 end : 

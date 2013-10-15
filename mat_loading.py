@@ -7,15 +7,15 @@ import pdb
 from operator import itemgetter, attrgetter
 import datetime
 
-def load_data():
+def load_data(file = "H4/Tagged_Training_07_26_1343286001"):
     ''' Load the .mat files. '''
     #testData = io.loadmat('data/H4/Testing_09_13_1347519601.mat', struct_as_record=False, squeeze_me=True)
     
-    file = "H4/Tagged_Training_07_26_1343286001"
+    #file = "H4/Tagged_Training_07_26_1343286001"
     #file = "H4/Tagged_Training_07_27_1343372401"
     #file = "H1/Tagged_Training_04_13_1334300401"
 
-    taggingData = io.loadmat('data/' + file + '.mat', struct_as_record=False, squeeze_me=True)
+    taggingData = io.loadmat(file, struct_as_record=False, squeeze_me=True)
     #taggingInfoData = io.loadmat('data/H4/AllTaggingInfo.mat', struct_as_record=False, squeeze_me=True)
 
     # Extract tables
