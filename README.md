@@ -36,6 +36,9 @@ In [89]: ml.device_sample_all(d)
 ```
 
 (This throws up about 20 plots...)
+* smart_plot: You'll need to make the plotting window large enough for the HF EMI plot to be as wide as the LF plots. Then the time axes will line up, so you can see simultaneous impact of a device on power and HF EMI.
+You might want to play with smart_plot's min_bin and max_bin parameters to look at other parts of the frequency range.
+
 
 * Appliances always off benchmark: 0.08
 * Total hamming loss: 0.32
