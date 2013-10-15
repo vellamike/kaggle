@@ -132,13 +132,13 @@ def device_sample(d, device_no, min_bin = 0,
 def smart_plot(d,
                start_time, # Unix timestamp
                period_length,
-               L1_real = False, # Flags to show different plots
-               L1_imaginary = False,
-               L1_factor = False,
+               L1_real = True, # Flags to show different plots
+               L1_imaginary = True,
+               L1_factor = True,
                L2_real = False,
                L2_imaginary = False,
                L2_factor = False,
-               HF = False,
+               HF = True,
                min_bin = 50, # For the HF plot
                max_bin = 150,
                show_device_labels = True):
