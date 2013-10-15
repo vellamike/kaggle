@@ -7,6 +7,8 @@ won't like it. (Also, it will make everything really slow).
 BD Thoughts:
 ---------------------
 
+* On the leaderboard: All but 2 teams have made relatively little progress over the baseline. For a long time slow but steady was first with ~0.05, and second place was ~0.07. Titan dropped suddenly from ~0.07 to 0.05. What this means for us: Since we can assume all the top teams are trying hard, there is likely some *significant and unexpected* feature to find. We haven't found it yet.
+
 * Not quite sure which frequencies the HF data represents. The action seems to be happening in the bins near the end 3500-4000. Perhaps this corresponds to frequencies c. 50kHz-550kHz, which would fit with the plots on the competition description. I don't think this is particularly important.
 
 * Big devices should show up in the power consumption. Small devices with high frequency switching, such as CFLs, should create HF EMI. I can't see any means of predicting any remaining devices.
