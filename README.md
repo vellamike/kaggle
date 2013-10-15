@@ -4,7 +4,7 @@ Kaggle Belkin competition
 WARNING:Don't add raw data to the git repo, it's too big and github
 won't like it. (Also, it will make everything really slow).
 
-BD had some thoughts:
+BD Thoughts:
 ---------------------
 
 * Not quite sure which frequencies the HF data represents. The action seems to be happening in the bins near the end 3500-4000. Perhaps this corresponds to frequencies c. 50kHz-550kHz, which would fit with the plots on the competition description. I don't think this is particularly important.
@@ -40,7 +40,7 @@ In [89]: ml.device_sample_all(d)
 * Approximate ON time (public data): Total hamming loss * timepoints * approx. devices per house = 2670080
 * Percentage equivalent ON time: Approximate_on_time / timepoints = 0.32 * 38 / 2 = 6.08
 
-MV's thoughts:
+MV Thoughts:
 --------------
 As a 1st order approx we should:
 
