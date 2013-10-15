@@ -17,7 +17,7 @@ BD Thoughts:
 
 *  [Splitphase power](http://en.wikipedia.org/wiki/Split-phase_electric_power) is used, so appliances are on a multiwire branch circuit. Some will get phase 1, some phase 2, some (big appliances) both. Unless the devices move, this should be reflected in the power usage on each phase. 
 
-* Example iPython session. Shows what's going on for high frequency, and phase 1 of the power line between 13:00 and 13:30:
+* Example iPython session. Shows what's going on for high frequency, and phase 1 of the power line between 13:00 and 13:30 (NB houses are in California: GMT -8):
 
 
 ```
