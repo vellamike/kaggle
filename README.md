@@ -1,8 +1,8 @@
-kaggle
-======
+Kaggle Belkin competition
+=========================
 
-Ben had some thoughts:
-
+BD had some thoughts:
+---------------------
 
 * Not quite sure which frequencies the HF data represents. The action seems to be happening in the bins near the end 3500-4000. Perhaps this corresponds to frequencies c. 50kHz-550kHz, which would fit with the plots on the competition description. I don't think this is particularly important.
 
@@ -28,11 +28,22 @@ In [89]: ml.device_sample_all(d)
 
 (This throws up about 20 plots...)
 
+* Appliances always off benchmark: 0.08
+* Total hamming loss: 0.32
+* Timepoints: 219579
+* Approximate devices per house: 38
+* Approximate ON time (public data): Total hamming loss * timepoints * approx. devices per house = 2670080
+* Percentage equivalent ON time: Approximate_on_time / timepoints = 0.32 * 38 / 2 = 6.08
 
+MV's thoughts:
+--------------
+As a 1st order approx we should:
 
-Appliances always off benchmark: 0.08
-Total hamming loss: 0.32
-Timepoints: 219579
-Approximate devices per house: 38
-Approximate ON time (public data): Total hamming loss * timepoints * approx. devices per house = 2670080
-Percentage equivalent ON time: Approximate_on_time / timepoints = 0.32 * 38 / 2 = 6.08
+* Assume a divice is off if error margin seems big (6.08% on-time
+  implies this is reasonable)
+* Assume everything is off at night (unless an obvious reason not to?)
+* Error function such that divices which are not on very much (e.g
+  Washing machines, toasters) should just be set to permanently off.
+  This is particularly true because looking at the forums it seems as
+  though there are issues with tagging of washing machines.
+  
