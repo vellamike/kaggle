@@ -7,14 +7,18 @@ import pdb
 from operator import itemgetter, attrgetter
 import datetime
 
+H4_training = ["H4/Tagged_Training_07_26_1343286001.mat",
+               "H4/Tagged_Training_07_27_1343372401.mat"]
+H4_testing = ["H4/Testing_09_12_1347433201.mat",
+              "H4/Testing_09_13_1347519601.mat",
+              "H4/Testing_09_18_1347951601.mat",
+              "H4/Testing_09_19_1348038001.mat"]
+
+def load_tagging_info(file = "H4/AllTaggingInfo.mat"):
+    taggingData = 
+
 def load_data(file = "H4/Tagged_Training_07_26_1343286001.mat"):
     ''' Load the .mat files. '''
-    #testData = io.loadmat('data/H4/Testing_09_13_1347519601.mat', struct_as_record=False, squeeze_me=True)
-    
-    #file = "H4/Tagged_Training_07_26_1343286001"
-    #file = "H4/Tagged_Training_07_27_1343372401"
-    #file = "H1/Tagged_Training_04_13_1334300401"
-
     taggingData = io.loadmat(file, struct_as_record=False, squeeze_me=True)
     #taggingInfoData = io.loadmat('data/H4/AllTaggingInfo.mat', struct_as_record=False, squeeze_me=True)
 
@@ -33,8 +37,10 @@ def load_data(file = "H4/Tagged_Training_07_26_1343286001.mat"):
     d.HF            = buf.HF
                              
     d.HF_TimeTicks = buf.TimeTicksHF
-     
-    d.taggingInfo = buf.TaggingInfo
+    
+    if hasattr(buf, 'TaggingInfo'):
+        d.taggingInfo = buf.TaggingInfo
+        d.tags = make_tags(d.taggingInfo)
      
     # Calculate power by convolution
     L1_P = LF1V * LF1I.conjugate()
@@ -78,12 +84,13 @@ def date_str(stamp):
 def add_devices(ax, d, timeticks, bottom=300, step=300):
     '''
     Add a green line for every device. '''
-    for i in range(len(d.taggingInfo)):
-        if d.taggingInfo[i, 2]>= timeticks[0] and d.taggingInfo[i, 3] <=\
-        timeticks[-1]:
-            ax.plot([d.taggingInfo[i,2],d.taggingInfo[i,3]], [i*step+bottom,i*step+bottom], color=(0,1,0,0.5), linewidth=10)
-            str1 = '%s' % d.taggingInfo[i,1]
-            ax.text(timeticks[0],step*i+bottom, str1)
+    if hasattr(d, "taggingInfo"):
+        for i in range(len(d.taggingInfo)):
+            if d.taggingInfo[i, 2]>= timeticks[0] and d.taggingInfo[i, 3] <=\
+            timeticks[-1]:
+                ax.plot([d.taggingInfo[i,2],d.taggingInfo[i,3]], [i*step+bottom,i*step+bottom], color=(0,1,0,0.5), linewidth=10)
+                str1 = '%s' % d.taggingInfo[i,1]
+                ax.text(timeticks[0],step*i+bottom, str1)
 
 
 HF_tick_size = 1.06
@@ -129,6 +136,13 @@ def device_sample(d, device_no, min_bin = 0,
             HF_subset = d.HF[min_bin: max_bin,r]
             ax1.imshow(HF_subset, aspect = 0.1)
 
+def plot_test_days():
+    for file in H4_testing:
+        d = load_data(file)
+        smart_plot(d, d.start, d.end - d.start)
+        raw_input("Press to continue.")
+        del d
+
 def smart_plot(d,
                start_time, # Unix timestamp
                period_length,
@@ -139,8 +153,8 @@ def smart_plot(d,
                L2_imaginary = False,
                L2_factor = False,
                HF = True,
-               min_bin = 50, # For the HF plot
-               max_bin = 150,
+               min_bin = 3920, # For the HF plot
+               max_bin = 4020,
                show_device_labels = True):
     fig = figure(1)
     fig.clf()
@@ -189,11 +203,12 @@ def smart_plot(d,
         ax_L1_factor.set_title('Power Factor Phase 1');
         ax_L1_factor.autoscale(tight = True)
         plot_counter += 1
+        ax_L1_factor.set_xlabel('Unix Timestamp');
     if L2_real:
         ax_L2_real = fig.add_subplot(num_plots, 1, plot_counter)
         ax_L2_real.plot(d.L2_TimeTicks[subset], d.L2_Real[subset], color='blue')
         ax_L2_real.set_title('Real Power Phase 2')
-        ax_L2_real.autoscale(tight = True)
+        ax_L2_real.autoscale(tigh = True)
         plot_counter += 1
     if L2_imaginary:
         ax_L2_imaginary = fig.add_subplot(num_plots, 1, plot_counter)
@@ -218,10 +233,29 @@ def smart_plot(d,
     #fig.tight_layout()
     
     
-    ax_L1_factor.set_xlabel('Unix Timestamp');
     if show_device_labels:
         add_devices(ax_L1_real, d, d.L1_TimeTicks[subset])
     return fig 
+
+def make_tags(taggingInfo):
+    tags = [None] * 40
+    for i in range(len(taggingInfo)):
+        device_no = taggingInfo[i, 0]
+        name = taggingInfo[i, 1]
+        start_time = taggingInfo[i, 2]
+        end_time = taggingInfo[i, 3]
+        if tags[device_no] is None:
+            tags[device_no] = Device(name, device_no)
+        tags[device_no].periods.append((start_time, end_time))
+    return tags
+
+
+class Device:
+    def __init__(self, name, number):
+        self.name = name
+        self.number = number
+        self.periods = []
+
 
 
 def total_on_time(d):
@@ -242,14 +276,14 @@ def total_on_time(d):
         print("{0}: {1}s".format(n, t))
     return appliances
 
-def hf_time_slice(d, stamp):
+def plot_hf_time_slice(d, stamp = None, slice = None):
     ''' Plots spectogram at the next time after the timestamp. '''
-    for (i, t) in enumerate(d.HF_TimeTicks):
-        if t > stamp:
-            slice = i
-    HF_slice = d.HF[:, i]
+    if slice is None:
+        HF_slice = d.HF[:, next_hf_slice(d, stamp)]
+    else:
+        HF_slice = d.HF[:, slice]
     assert(len(HF_slice) == 4096)
-    fig = figure(972)
+    fig = figure()
     ax1 = fig.add_subplot(111)
     ax1.plot(range(4096), HF_slice)
     ax1.autoscale(tight = True)
@@ -261,21 +295,102 @@ def local_least_squares(d,
                         window_size):
     ''' Let's try something simpler before implementing this. '''
 
+def next_hf_slice(d, stamp):
+    for (i, t) in enumerate(d.HF_TimeTicks):
+        if t >= stamp:
+            return i
+
+def median_smoothing(array, 
+                     half_width):
+    array_smoothed = np.zeros(len(array))
+    for i in range(len(array)):
+        start = i - half_width
+        if start < 0: start = 0
+        end = i + half_width
+        if end > len(array) -1: end = len(array) - 1
+        array_smoothed[i] = np.median(array[start: end])
+    return array_smoothed
+
+def dimmer_predict():
+    for file in H4_testing:
+        print(file)
+        d = load_data(file)
+        print(predict_kitchen_dimmer(d))
+        del d
+        
+
+
 def predict_kitchen_dimmer(d):
     ''' Hopefully a prototype for a more general prediction algorithm. ''' 
     # The kitchen dimmer creates a peak around bin 4000.
     # Bin 4000 is the 96th bin from the end.
     # Each bin corresponds to 244 Hz, so the kitchen dimmer has a
     # peak at around 24kHz.
- 
-    power_in_range = np.zeros(len(d.HF_TimeTicks))
+    '''
+    (start, end) = d.tags[21].periods[0]
+    kitchen_dimmer_on_slice = next_hf_slice(d, (start + end)/2.0)
+    kitchen_dimmer_off_slice = next_hf_slice(d, start - 30)
+    #plot_hf_time_slice(d, slice = kitchen_dimmer_on_slice)
+    #plot_hf_time_slice(d, slice = kitchen_dimmer_off_slice)
+
+    on_spect = d.HF[:, kitchen_dimmer_on_slice].astype(np.float)
+    off_spect = d.HF[:, kitchen_dimmer_off_slice].astype(np.float)
+    diff = on_spect - off_spect
+    diff_smoothed = median_smoothing(diff, 10)'''
+    #fig = figure()
+    #ax = fig.add_subplot(111)
+    #ax.plot(range(4096), diff)
+    #f2 = figure()
+    #ax2 = f2.add_subplot(111)
+    #ax2.plot(range(4096), diff_smoothed)
+    on_events = [] 
     for (i, t) in enumerate(d.HF_TimeTicks):
-        # Take an average over neighbouring bins.
-        power_in_range[i] = sum(d.HF[3999:4002, i])/3.0
+        step_size = 5 
+        if i % step_size == 0:
+            if i + step_size < len(d.HF_TimeTicks):
+                if float(d.HF[4000, i+step_size]) - float(d.HF[4000, i]) > 23:
+                    on_events.append(i)
+    for on in on_events:
+        break
+        f = figure()
+        a = f.add_subplot(111)
+        a.imshow(d.HF[:, on - 100: on + 100])
+    off_events = [] 
+    for (i, t) in enumerate(d.HF_TimeTicks):
+        step_size = 5 
+        if i % step_size == 0:
+            if i + step_size < len(d.HF_TimeTicks):
+                if float(d.HF[4000, i+step_size]) - float(d.HF[4000, i]) < -23:
+                    off_events.append(i)
+    for off in off_events:
+        break
+        f = figure()
+        a = f.add_subplot(111)
+        a.imshow(d.HF[:, off - 100: off + 100])
+    pairs = []
+    for on_slice in on_events: 
+        for off_slice in off_events:
+            if on_slice + 5000 >= off_slice >= on_slice:
+                pairs.append((on_slice, off_slice))
+                off_events.remove(off_slice)
+                break
+
+    time_pairs = []
+    for (on, off) in pairs:
+        time_pairs.append((d.HF_TimeTicks[on], d.HF_TimeTicks[off]))
+
+    
+    
+    return (on_events, off_events, pairs, time_pairs)
+    
+    #power_in_range = np.zeros(len(d.HF_TimeTicks))
+    #for (i, t) in enumerate(d.HF_TimeTicks):
+    #    # Take an average over neighbouring bins.
+    #    power_in_range[i] = sum(d.HF[3999:4002, i])/3.0
         
-    fig = figure(222)
-    ax1 = fig.add_subplot(111)
-    ax1.plot(d.HF_TimeTicks, power_in_range)
+    #fig = figure(222)
+    #ax1 = fig.add_subplot(111)
+    #ax1.plot(d.HF_TimeTicks, power_in_range)'''
 
 def bin_data(d):
     ''' Puts the HF data into bins in time and frequency space. The idea is that we might realize a particular device has been turned on if there is suddenly much more power in a particular bin. '''
